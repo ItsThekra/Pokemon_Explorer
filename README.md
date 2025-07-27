@@ -1,38 +1,44 @@
-# sv
+# 🧭 Pokémon Explorer
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+![App Screenshot](./screenshot.png)
 
-## Creating a project
+**Pokémon Explorer** is a sleek and responsive web application that allows users to browse, search, and explore detailed information about Pokémon from the official [PokéAPI](https://pokeapi.co/). The UI is inspired by modern dashboard layouts and provides a smooth experience across devices.
 
-If you're seeing this, you've probably already done this step. Congrats!
+---
+
+##  Features
+
+-  **Search by name** with live filtering
+-  **Filter by type** using multi-select dropdown
+-  **Detailed Pokémon view** (image, stats, abilities, types)
+-   Fully responsive and mobile-friendly design
+-   Built with performance in mind and clean animations
+
+---
+
+## Technologies Used
+
+- **[SvelteKit](https://kit.svelte.dev/)** – Fast and modern web framework
+- **[TailwindCSS](https://tailwindcss.com/)** – Utility-first styling
+- **[PokéAPI](https://pokeapi.co/)** – Free RESTful Pokémon data API
+- **TypeScript** – For strong typing and maintainability
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or bun
+
+### Installation
 
 ```bash
-# create a new project in the current directory
-npx sv create
+# Clone the repo
+git clone https://github.com/your-username/pokemon-explorer.git
 
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+# Install dependencies
+npm install
+# or
+bun install
