@@ -1,8 +1,6 @@
 # 🧭 Pokémon Explorer
 
-![App Screenshot](./screenshot.png)
-![Preview](./static/screenshot.png)
-
+![App Screenshot](static/screenshot.png)
 
 **Pokémon Explorer** is a sleek and responsive web application that allows users to browse, search, and explore detailed information about Pokémon from the official [PokéAPI](https://pokeapi.co/). The UI is inspired by modern dashboard layouts and provides a smooth experience across devices.
 
