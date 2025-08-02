@@ -3,6 +3,11 @@
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
+	"engines": {
+		"node": ">=20.0.0",
+		"bun": ">=1.0.0"
+	},
+	"packageManager": "bun@1.0.0",
 	"scripts": {
 		"dev": "bun run vite dev",
 		"build": "bun run vite build",
@@ -13,7 +18,10 @@
 		"format": "bun run prettier --write .",
 		"lint": "bun run prettier --check . && bun run eslint .",
 		"start": "bun run vite preview",
-		"bun-server": "bun src/lib/server.ts"
+		"bun-server": "bun src/lib/server.ts",
+		"dev:npm": "npm run vite dev",
+		"build:npm": "npm run vite build",
+		"preview:npm": "npm run vite preview"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

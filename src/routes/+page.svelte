@@ -5,25 +5,15 @@
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import Spinner from '$lib/components/Spinner.svelte';
 	import type { PageData } from './$types';
+	import type { PokemonCard, PokemonDetails } from '$lib/types';
+	import { CONFIG } from '$lib/config';
 	
 	// Available shadcn/ui components only
 	import { Button } from "$lib/components/ui/button/index.js";
 	import { Badge } from "$lib/components/ui/badge/index.js";
-	import { Input } from "$lib/components/ui/input/index.js";
 	import { Label } from "$lib/components/ui/label/index.js";
-	import * as Select from "$lib/components/ui/select/index.js";
-	import { Progress } from "$lib/components/ui/progress/index.js";
-	import { Skeleton } from "$lib/components/ui/skeleton/index.js";
 
 	let { data }: { data: PageData } = $props();
-
-	// Debug logging
-	$effect(() => {
-		console.log('Page data received:', data);
-		console.log('Pokemon count:', data.pokemons?.length || 0);
-		console.log('Search term:', data.searchTerm);
-		console.log('Selected type:', data.selectedType);
-	});
 
 	function clickOutside(node: HTMLElement, callback: () => void) {
 		const handleClick = (event: MouseEvent) => {
@@ -38,27 +28,6 @@
 			}
 		};
 	}
-
-	type PokemonCard = {
-		id: string;
-		name: string;
-		image: string;
-		types: string[];
-		stats?: { name: string; value: number }[];
-		abilities?: string[];
-	};
-
-	type PokemonDetails = {
-		id: string;
-		name: string;
-		image: string;
-		types: string[];
-		stats: { name: string; value: number }[];
-		abilities: string[];
-		height: number;
-		weight: number;
-		base_experience: number;
-	};
 
 	let selectedPokemon = $state<PokemonDetails | null>(null);
 	let loadingDetails = $state(false);
@@ -77,10 +46,6 @@
 
 	// Update state when data changes
 	$effect(() => {
-		console.log('EFFECT: Updating state from server data');
-		console.log('EFFECT: Server search term:', data.searchTerm);
-		console.log('EFFECT: Server selected type:', data.selectedType);
-		
 		currentlyLoaded = data.currentlyLoaded || 5;
 		maxPokemon = data.maxPokemon || 50;
 		canLoadMore = data.canLoadMore || false;
@@ -92,8 +57,6 @@
 		
 		// Stop searching indicator when data arrives
 		isSearching = false;
-		
-		console.log('EFFECT: Local state updated - searchTerm:', searchTerm, 'selectedType:', selectedTypeValue);
 	});
 
 	// Search handlers - simplified
@@ -112,7 +75,7 @@
 		// Quick debounce for better UX
 		searchTimeout = setTimeout(() => {
 			updateURL();
-		}, 300);
+		}, CONFIG.DEBOUNCE_DELAY);
 	}
 
 	function handleSearch() {
@@ -125,9 +88,7 @@
 	}
 
 	function handleTypeChange(value: string) {
-		console.log('Type change triggered with value:', value);
 		selectedTypeValue = value || '';
-		console.log('Selected type set to:', selectedTypeValue);
 		isSearching = true;
 		// Immediate filter change
 		updateURL();
@@ -161,7 +122,7 @@
 		}
 		
 		// Always reset to 5 Pokemon when searching or filtering
-		params.set('loaded', '5');
+		params.set('loaded', CONFIG.POKEMON_PER_PAGE.toString());
 		
 		const newURL = `${window.location.pathname}?${params.toString()}`;
 		goto(newURL, { replaceState: false, noScroll: true });
@@ -228,7 +189,7 @@
 <div class="flex flex-col lg:flex-row h-screen overflow-hidden bg-background text-foreground">
 	<!-- Mobile Header -->
 	<div class="lg:hidden bg-card border-b border-border p-3 flex items-center justify-between">
-		<h1 class="text-lg font-bold text-primary">Pokédex Explorer</h1>
+		<h1 class="text-lg font-bold text-primary">{CONFIG.APP_NAME}</h1>
 		<button
 			onclick={toggleSidebar}
 			class="p-2 hover:bg-muted rounded-md transition-colors"
@@ -250,6 +211,10 @@
 			<div 
 				class="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm"
 				onclick={() => sidebarOpen = false}
+				role="button"
+				tabindex="0"
+				aria-label="Close sidebar"
+				onkeydown={(e) => e.key === 'Escape' && (sidebarOpen = false)}
 			></div>
 		{/if}
 		
@@ -257,10 +222,11 @@
 		<div class="relative bg-card p-3 lg:p-0 lg:flex-1 lg:space-y-4 xl:space-y-6 h-full lg:h-auto overflow-y-auto">
 			<!-- Mobile Close Button -->
 			<div class="lg:hidden flex items-center justify-between mb-4 pb-3 border-b border-border">
-				<h1 class="text-xl font-bold text-primary">Pokédex Explorer</h1>
+				<h1 class="text-xl font-bold text-primary">{CONFIG.APP_NAME}</h1>
 				<button
 					onclick={() => sidebarOpen = false}
 					class="p-2 hover:bg-muted rounded-md transition-colors"
+					aria-label="Close sidebar"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -268,10 +234,9 @@
 				</button>
 			</div>
 
-			<!-- Desktop Logo/Header -->
 			<div class="hidden lg:block text-center">
-				<h1 class="text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2">Pokédex Explorer</h1>
-				<p class="text-xs lg:text-sm text-muted-foreground">Gotta catch 'em all!</p>
+				<h1 class="text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2">{CONFIG.APP_NAME}</h1>
+				<p class="text-xs lg:text-sm text-muted-foreground">{CONFIG.APP_DESCRIPTION}</p>
 			</div>
 
 		<!-- Search and Filters -->

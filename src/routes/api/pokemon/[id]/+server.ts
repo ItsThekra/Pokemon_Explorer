@@ -1,14 +1,14 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { CONFIG } from '$lib/config';
 
 export const GET: RequestHandler = async ({ params }) => {
   try {
     const { id } = params;
-    console.log(`Fetching Pokemon details for ID: ${id}`);
     
     // Add timeout and retry logic for Pokemon API
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
     
     try {
       const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`, {
@@ -25,7 +25,6 @@ export const GET: RequestHandler = async ({ params }) => {
       }
       
       const data = await response.json();
-      console.log(`Successfully fetched Pokemon ${id}: ${data.name}`);
       return json(data);
       
     } catch (fetchError) {

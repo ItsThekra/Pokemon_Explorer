@@ -1,1 +1,2 @@
-// place files you want to import through the `$lib` alias in this folder.
+// Re-export types for easier imports
+export type { PokemonCard, PokemonDetails, PageData } from './types';
