@@ -7,28 +7,13 @@
 	import type { PageData } from './$types';
 	import type { PokemonCard, PokemonDetails } from '$lib/types';
 	import { CONFIG } from '$lib/config';
-	
-	// Available shadcn/ui components only
 	import { Button } from "$lib/components/ui/button/index.js";
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Label } from "$lib/components/ui/label/index.js";
 
 	let { data }: { data: PageData } = $props();
 
-	function clickOutside(node: HTMLElement, callback: () => void) {
-		const handleClick = (event: MouseEvent) => {
-			if (!node.contains(event.target as Node)) {
-				callback();
-			}
-		};
-		document.addEventListener('mousedown', handleClick, true);
-		return {
-			destroy() {
-				document.removeEventListener('mousedown', handleClick, true);
-			}
-		};
-	}
-
+	
 	let selectedPokemon = $state<PokemonDetails | null>(null);
 	let loadingDetails = $state(false);
 	let searchTerm = $state(data.searchTerm || '');
@@ -186,6 +171,7 @@
 	});
 </script>
 
+
 <div class="flex flex-col lg:flex-row h-screen overflow-hidden bg-background text-foreground">
 	<!-- Mobile Header -->
 	<div class="lg:hidden bg-card border-b border-border p-3 flex items-center justify-between">
@@ -262,6 +248,7 @@
 						<button
 							onclick={clearSearch}
 							class="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground hover:text-destructive transition-colors"
+							aria-label="Clear search"
 						>
 							<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>

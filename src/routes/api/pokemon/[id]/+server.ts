@@ -2,31 +2,11 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { CONFIG } from '$lib/config';
 
-// مفاتيح API المسموحة (في الإنتاج ضعها في متغيرات البيئة)
-const VALID_API_KEYS = [
-  'your-secret-api-key-1',
-  'your-secret-api-key-2'
-];
-
-function validateApiKey(request: Request): boolean {
-  const apiKey = request.headers.get('x-api-key') || 
-                 request.headers.get('authorization')?.replace('Bearer ', '');
-  
-  return apiKey ? VALID_API_KEYS.includes(apiKey) : false;
-}
 
 export const GET: RequestHandler = async ({ params, request }) => {
   try {
-    // فحص مفتاح API (اختياري - علق السطور التالية لتعطيل الفحص)
-    // if (!validateApiKey(request)) {
-    //   return json({ 
-    //     error: 'Unauthorized',
-    //     message: 'Valid API key required' 
-    //   }, { status: 401 });
-    // }
-    const { id } = params;
     
-    // Add timeout and retry logic for Pokemon API
+    const { id } = params;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
     

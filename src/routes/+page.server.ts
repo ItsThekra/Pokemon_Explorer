@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
   const loadMore = url.searchParams.get('loadMore') === 'true';
   
   // Load Pokemon settings from config
-  const increment = CONFIG.POKEMON_PER_PAGE;
+  const increment = CONFIG.POKEMON_PER_PAGE; //every time increment by 5 
   const maxPokemon = CONFIG.MAX_POKEMON_LOAD;
   const currentlyLoaded = loadMore ? Math.min(loadedCount + increment, maxPokemon) : Math.min(Math.max(loadedCount, increment), maxPokemon);
   
