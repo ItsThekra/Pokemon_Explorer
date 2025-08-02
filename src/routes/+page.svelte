@@ -349,7 +349,7 @@
 
 	<!-- Main Content -->
 	<main class="flex-1 bg-background overflow-hidden">
-		<div class="h-full pokemon-list-scroll overflow-y-auto">
+		<div class="h-full overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-none">
 			<div class="p-3 lg:p-4">
 				<!-- Pokemon List/Column -->
 				<div class="space-y-3 max-w-2xl">
@@ -434,7 +434,7 @@
 						</div>
 					</div>
 
-					<div class="flex-1 overflow-y-auto custom-scrollbar">
+					<div class="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth scrollbar-none">
 						<div class="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 md:space-y-6">
 							<!-- Pokemon Image -->
 							<div class="text-center">
@@ -513,41 +513,3 @@
 		</aside>
 	{/if}
 </div>
-
-<style>
-	.pokemon-list-scroll::-webkit-scrollbar {
-		width: 8px;
-	}
-
-	.pokemon-list-scroll::-webkit-scrollbar-track {
-		background: hsl(var(--muted));
-		border-radius: 6px;
-	}
-
-	.pokemon-list-scroll::-webkit-scrollbar-thumb {
-		background: hsl(var(--muted-foreground) / 0.3);
-		border-radius: 6px;
-	}
-
-	.pokemon-list-scroll::-webkit-scrollbar-thumb:hover {
-		background: hsl(var(--muted-foreground) / 0.5);
-	}
-
-	.custom-scrollbar::-webkit-scrollbar {
-		width: 8px;
-	}
-
-	.custom-scrollbar::-webkit-scrollbar-track {
-		background: hsl(var(--muted));
-		border-radius: 6px;
-	}
-
-	.custom-scrollbar::-webkit-scrollbar-thumb {
-		background: hsl(var(--muted-foreground) / 0.3);
-		border-radius: 6px;
-	}
-
-	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-		background: hsl(var(--muted-foreground) / 0.5);
-	}
-</style>
