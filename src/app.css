@@ -2,7 +2,7 @@
 
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* Removed unsupported @custom-variant at-rule */
 
 /* إخفاء شريط التمرير مع الحفاظ على الوظيفة */
 .scrollbar-none {

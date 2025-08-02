@@ -9,11 +9,18 @@ export const CONFIG = {
   API_TIMEOUT: 8000, // 8 seconds
   DEBOUNCE_DELAY: 300, // 300ms for search
   
+  // Security settings
+  RATE_LIMIT_REQUESTS: 100, // عدد الطلبات المسموحة
+  RATE_LIMIT_WINDOW: 15 * 60 * 1000, // 15 دقيقة
+  ENABLE_RATE_LIMITING: true,
+  ENABLE_IP_FILTERING: false, // تفعيل/تعطيل فلتر IP
+  ENABLE_API_KEY_AUTH: false, // تفعيل/تعطيل مفاتيح API
+  
   // Pokemon API endpoints (for reference only)
   POKEMON_API_BASE: 'https://pokeapi.co/api/v2',
   
   // App metadata
-  APP_NAME: 'Pokédex Explorer',
+  APP_NAME: 'Pokédx Explorer',
   APP_DESCRIPTION: 'Gotta catch \'em all!',
   
   // UI settings
