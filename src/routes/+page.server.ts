@@ -19,34 +19,64 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
     // For better search and type filtering, load more Pokemon when searching
     const searchLimit = (searchTerm || selectedType) ? CONFIG.SEARCH_LIMIT_EXTENDED : maxPokemon;
     
-    // Load Pokemon for current batch or extended range for filtering
-    const pokemonRes = await fetch(`${host}/api/pokemon?limit=${searchLimit}&offset=0`);
-    const pokemonData = await pokemonRes.json();
+    // Load Pokemon AND types in parallel (MAJOR PERFORMANCE BOOST!)
+    const [pokemonRes, typesRes] = await Promise.all([
+      fetch(`${host}/api/pokemon?limit=${searchLimit}&offset=0`),
+      fetch(`${host}/api/types`)
+    ]);
     
-    // Load detailed Pokemon data from local API routes
+    const [pokemonData, typesData] = await Promise.all([
+      pokemonRes.json(),
+      typesRes.json()
+    ]);
+    
+    const types = typesData.results.map((type: { name: string }) => type.name);
+    
+    // Load detailed Pokemon data with timeout protection
     const detailedPokemons = await Promise.all(
       pokemonData.results.map(async (poke: { name: string; url: string }) => {
         const id = poke.url.split('/').filter(Boolean).pop();
-        const detail = await fetch(`${host}/api/pokemon/${id}`).then((res) => res.json());
         
-        return {
-          id,
-          name: poke.name,
-          image: detail.sprites.front_default,
-          types: detail.types.map((t: { type: { name: string } }) => t.type.name),
-          stats: detail.stats.map((s: { stat: { name: string }; base_stat: number }) => ({
-            name: s.stat.name,
-            value: s.base_stat
-          })),
-          abilities: detail.abilities.map((a: { ability: { name: string } }) => a.ability.name)
-        };
+        try {
+          // Add timeout to prevent hanging requests
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
+          
+          const detail = await fetch(`${host}/api/pokemon/${id}`, {
+            signal: controller.signal
+          }).then((res) => res.json());
+          
+          clearTimeout(timeoutId);
+          
+          return {
+            id,
+            name: poke.name,
+            image: detail.sprites?.front_default || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+            types: detail.types?.map((t: { type: { name: string } }) => t.type.name) || ['normal'],
+            stats: detail.stats?.map((s: { stat: { name: string }; base_stat: number }) => ({
+              name: s.stat.name,
+              value: s.base_stat
+            })) || [],
+            abilities: detail.abilities?.map((a: { ability: { name: string } }) => a.ability.name) || []
+          };
+        } catch (error) {
+          console.error(`Failed to load Pokemon ${id}:`, error);
+          // Return fallback data instead of failing
+          return {
+            id,
+            name: poke.name,
+            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
+            types: ['normal'],
+            stats: [
+              { name: 'hp', value: 50 },
+              { name: 'attack', value: 50 },
+              { name: 'defense', value: 50 }
+            ],
+            abilities: ['hidden-ability']
+          };
+        }
       })
     );
-    
-    // Load Pokemon types from local API routes
-    const typesRes = await fetch(`${host}/api/types`);
-    const typesData = await typesRes.json();
-    const types = typesData.results.map((type: { name: string }) => type.name);
     
     // Filter Pokemon based on search and type
     let filteredPokemons = detailedPokemons;
