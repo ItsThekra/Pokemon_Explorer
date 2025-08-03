@@ -12,20 +12,20 @@
 
 ---
 
-##  Features
+## ⭐ Features
 
--  **Search by name** with live filtering
--  **Filter by type** using multi-select dropdown
--  **Detailed Pokémon view** (image, stats, abilities, types)
--   Fully responsive and mobile-friendly design
--   Built with performance in mind and clean animations
--  **Advanced Error Handling** - Works even when Pokemon API is down
--  **Smart Caching** - Optimized performance with intelligent cache strategy
--  **Retry Mechanism** - Automatic retry with exponential backoff for reliability
+- 🔍 **Search by name** with live filtering
+- 🏷️ **Filter by type** using multi-select dropdown
+- 📋 **Detailed Pokémon view** (image, stats, abilities, types)
+- 📱 **Fully responsive** and mobile-friendly design
+- ⚡ **Built with performance** in mind and clean animations
+- 🛡️ **Advanced Error Handling** - Works even when Pokemon API is down
+- 🚀 **Smart Caching** - Optimized performance with intelligent cache strategy
+- 🔄 **Retry Mechanism** - Automatic retry with exponential backoff for reliability
 
 ---
 
-## Technologies Used
+## 🛠️ Technologies Used
 
 - **[SvelteKit](https://kit.svelte.dev/)** – Fast and modern web framework
 - **[Svelte 5](https://svelte.dev/)** – Latest version with runes and improved reactivity
@@ -37,64 +37,7 @@
 
 ---
 
-## 🎯 Project Structure
-
-```
-src/
-├── lib/
-│   ├── components/           # Reusable Svelte components
-│   │   ├── ui/              # shadcn/ui components
-│   │   ├── Card.svelte      # Pokemon card component
-│   │   ├── Modal.svelte     # Modal component
-│   │   └── SearchBar.svelte # Search component
-│   ├── utils/
-│   │   └── network.ts       # Network utilities with retry logic
-│   ├── config.ts            # App configuration
-│   ├── server.ts            # Server utilities
-│   └── types.ts             # TypeScript type definitions
-├── routes/
-│   ├── api/                 # API endpoints
-│   │   ├── pokemon/         # Pokemon data endpoints
-│   │   └── types/           # Pokemon types endpoint
-│   ├── +layout.svelte       # App layout
-│   ├── +page.svelte         # Main page
-│   └── +page.server.ts      # Server-side data loading
-└── app.html                 # HTML template
-```
-
----
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📞 Support
-
-If you have any questions or issues, please [open an issue](https://github.com/ItsThekra/Pokemon_Explorer/issues) on GitHub.
-
----
-
-**Made with ❤️ and ⚡ by [ItsThekra](https://github.com/ItsThekra)**
-
-🎮 *Gotta catch 'em all!* 🎮
-
----
-
-## Getting Started
+## � Getting Started
 
 ### Prerequisites
 
@@ -103,13 +46,13 @@ If you have any questions or issues, please [open an issue](https://github.com/I
 
 > **⚠️ Important:** This project is optimized for **Bun** but works with npm/yarn as well.
 
-### Installation
+### 📦 Installation
 
 #### Option 1: Using Bun (Recommended)
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/pokemon-explorer.git
-cd pokemon-explorer
+git clone https://github.com/ItsThekra/Pokemon_Explorer.git
+cd Pokemon_Explorer
 
 # Install Bun if you haven't already
 curl -fsSL https://bun.sh/install | bash
@@ -124,8 +67,8 @@ bun dev
 #### Option 2: Using npm/yarn
 ```bash
 # Clone the repo
-git clone https://github.com/your-username/pokemon-explorer.git
-cd pokemon-explorer
+git clone https://github.com/ItsThekra/Pokemon_Explorer.git
+cd Pokemon_Explorer
 
 # Remove bun.lock to avoid conflicts
 rm bun.lock
@@ -141,7 +84,7 @@ npm run dev:npm
 yarn dev
 ```
 
-### Development Commands
+### 🔧 Development Commands
 
 | Command | Bun | npm | Description |
 |---------|-----|-----|-------------|
@@ -154,7 +97,7 @@ yarn dev
 
 ---
 
-## 🚀 Deployment
+## 🌐 Deployment
 
 This project is deployed on **[Render](https://render.com)** with automatic deployments from the main branch.
 
@@ -195,3 +138,58 @@ For detailed deployment instructions, see [RENDER_DEPLOYMENT.md](./RENDER_DEPLOY
 - Rate limiting protection (100 requests per 15 minutes)
 
 ---
+
+## 🎯 Project Structure
+
+```
+src/
+├── lib/
+│   ├── components/           # Reusable Svelte components
+│   │   ├── ui/              # shadcn/ui components
+│   │   ├── Card.svelte      # Pokemon card component
+│   │   ├── Modal.svelte     # Modal component
+│   │   └── SearchBar.svelte # Search component
+│   ├── utils/
+│   │   └── network.ts       # Network utilities with retry logic
+│   ├── config.ts            # App configuration
+│   ├── server.ts            # Server utilities
+│   └── types.ts             # TypeScript type definitions
+├── routes/
+│   ├── api/                 # API endpoints
+│   │   ├── pokemon/         # Pokemon data endpoints
+│   │   └── types/           # Pokemon types endpoint
+│   ├── +layout.svelte       # App layout
+│   ├── +page.svelte         # Main page
+│   └── +page.server.ts      # Server-side data loading
+└── app.html                 # HTML template
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+## 📞 Support
+
+If you have any questions or issues, please [open an issue](https://github.com/ItsThekra/Pokemon_Explorer/issues) on GitHub.
+
+---
+
+**Made with ❤️ and ⚡ by [ItsThekra](https://github.com/ItsThekra)**
+
+🎮 *Gotta catch 'em all!* 🎮
