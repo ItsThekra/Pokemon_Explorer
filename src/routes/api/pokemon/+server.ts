@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-
+import { CONFIG } from '$lib/config';
+import { fetchWithRetry, createMockPokemonList } from '$lib/utils/network';
 
 // Rate limiting 
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
@@ -41,23 +42,73 @@ export const GET: RequestHandler = async ({ url, getClientAddress }) => {
       });
     }
 
-    const limit = url.searchParams.get('limit') || '20';
-    const offset = url.searchParams.get('offset') || '0';
+    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const offset = parseInt(url.searchParams.get('offset') || '0');
     
-    // Proxy to PokéAPI
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch from PokéAPI');
+    // Validate parameters
+    if (limit > 1000 || limit < 1) {
+      return json({ error: 'Invalid limit parameter' }, { status: 400 });
     }
     
-    const data = await response.json();
-    return json(data);
+    if (offset < 0) {
+      return json({ error: 'Invalid offset parameter' }, { status: 400 });
+    }
+    
+    try {
+      // Proxy to PokéAPI with enhanced retry mechanism
+      const response = await fetchWithRetry(
+        `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`,
+        {
+          retries: 3,
+          delay: 1000,
+          backoff: true,
+          timeout: CONFIG.API_TIMEOUT
+        }
+      );
+      
+      const data = await response.json();
+      
+      // Validate response data
+      if (!data || !data.results) {
+        throw new Error('Invalid response data from Pokemon API');
+      }
+      
+      return json(data, {
+        headers: {
+          'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
+          'X-Source': 'pokemon-api'
+        }
+      });
+      
+    } catch (fetchError) {
+      console.error('Pokemon API error:', fetchError);
+      
+      // Return mock data as fallback
+      const mockData = createMockPokemonList(limit, offset);
+      
+      return json(mockData, { 
+        status: 200,
+        headers: {
+          'X-Fallback': 'true',
+          'X-Error': 'API unavailable',
+          'Cache-Control': 'public, max-age=60' // Cache fallback for 1 minute
+        }
+      });
+    }
+    
   } catch (error) {
-    console.error('Pokemon API error:', error);
-    return json(
-      { error: 'Failed to fetch Pokemon data' },
-      { status: 500 }
-    );
+    console.error('Unexpected Pokemon API error:', error);
+    
+    const limit = parseInt(url.searchParams.get('limit') || '20');
+    const offset = parseInt(url.searchParams.get('offset') || '0');
+    const mockData = createMockPokemonList(limit, offset);
+    
+    return json(mockData, { 
+      status: 200,
+      headers: {
+        'X-Fallback': 'true',
+        'X-Error': 'Unexpected error'
+      }
+    });
   }
 };

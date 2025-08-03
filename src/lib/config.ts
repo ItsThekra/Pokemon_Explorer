@@ -6,7 +6,7 @@ export const CONFIG = {
   SEARCH_LIMIT_EXTENDED: 200,
   
   // API settings
-  API_TIMEOUT: 8000, // 8 seconds
+  API_TIMEOUT: 15000, // 15 seconds - increased for better reliability
   DEBOUNCE_DELAY: 300, // 300ms for search
   
   // Security settings

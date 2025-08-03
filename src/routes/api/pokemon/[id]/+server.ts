@@ -1,63 +1,67 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { CONFIG } from '$lib/config';
-
+import { fetchWithRetry, createMockPokemon } from '$lib/utils/network';
 
 export const GET: RequestHandler = async ({ params, request }) => {
   try {
-    
     const { id } = params;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT);
+    
+    // Validate Pokemon ID
+    const pokemonId = parseInt(id || '0');
+    if (isNaN(pokemonId) || pokemonId < 1 || pokemonId > 1010) {
+      return json({ error: 'Invalid Pokemon ID' }, { status: 400 });
+    }
     
     try {
-      const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`, {
-        signal: controller.signal,
-        headers: {
-          'User-Agent': 'Pokemon-Explorer/1.0'
+      const response = await fetchWithRetry(
+        `https://pokeapi.co/api/v2/pokemon/${id}`, 
+        {
+          retries: 3,
+          delay: 1000,
+          backoff: true,
+          timeout: CONFIG.API_TIMEOUT
         }
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`Pokemon API returned ${response.status}: ${response.statusText}`);
-      }
+      );
       
       const data = await response.json();
+      
+      // Validate response data
+      if (!data || !data.id || !data.name) {
+        throw new Error('Invalid response data from Pokemon API');
+      }
+      
       return json(data);
       
     } catch (fetchError) {
-      clearTimeout(timeoutId);
-      throw fetchError;
+      console.error(`Pokemon detail API error for ID ${id}:`, fetchError);
+      
+      // Return comprehensive mock response as fallback
+      const mockPokemon = createMockPokemon(pokemonId);
+      
+      console.log(`Returning mock data for Pokemon ${pokemonId} due to API error`);
+      return json(mockPokemon, { 
+        status: 200,
+        headers: {
+          'X-Fallback': 'true',
+          'X-Error': 'API unavailable',
+          'Cache-Control': 'public, max-age=60' // Cache for 1 minute
+        }
+      });
     }
     
   } catch (error) {
-    console.error(`Pokemon detail API error for ID ${params.id}:`, error);
+    console.error(`Unexpected error for Pokemon ID ${params.id}:`, error);
     
-    // Return a mock response instead of failing completely
-    const mockPokemon = {
-      id: parseInt(params.id || '1'),
-      name: `pokemon-${params.id}`,
-      height: 10,
-      weight: 100,
-      base_experience: 100,
-      sprites: {
-        front_default: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${params.id}.png`
-      },
-      types: [{ type: { name: 'unknown' } }],
-      stats: [
-        { stat: { name: 'hp' }, base_stat: 50 },
-        { stat: { name: 'attack' }, base_stat: 50 },
-        { stat: { name: 'defense' }, base_stat: 50 },
-        { stat: { name: 'special-attack' }, base_stat: 50 },
-        { stat: { name: 'special-defense' }, base_stat: 50 },
-        { stat: { name: 'speed' }, base_stat: 50 }
-      ],
-      abilities: [{ ability: { name: 'unknown' } }]
-    };
+    const pokemonId = parseInt(params.id || '1');
+    const mockPokemon = createMockPokemon(pokemonId);
     
-    console.log(`Returning mock data for Pokemon ${params.id}`);
-    return json(mockPokemon);
+    return json(mockPokemon, { 
+      status: 200,
+      headers: {
+        'X-Fallback': 'true',
+        'X-Error': 'Unexpected error'
+      }
+    });
   }
 };
