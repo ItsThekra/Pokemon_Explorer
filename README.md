@@ -34,13 +34,9 @@
 
 ---
 
-## � Getting Started
+
 
 ### Prerequisites
-
-- **Node.js 20+** (recommended)
-- **Bun 1.0+** (preferred) OR **npm/yarn**
-
 > **⚠️ Important:** This project is optimized for **Bun** but works with npm/yarn as well.
 
 ### Installation
@@ -80,19 +76,6 @@ npm run dev:npm
 # or
 yarn dev
 ```
-
-### Development Commands
-
-| Command | Bun | npm | Description |
-|---------|-----|-----|-------------|
-| Development | `bun dev` | `npm run dev:npm` | Start dev server |
-| Build | `bun run build` | `npm run build:npm` | Build for production |
-| Preview | `bun run preview` | `npm run preview:npm` | Preview build |
-| Type Check | `bun run check` | `npm run check` | Run type checking |
-| Format | `bun run format` | `npm run format` | Format code |
-| Lint | `bun run lint` | `npm run lint` | Lint code |
-
----
 
 ## Deployment
 
