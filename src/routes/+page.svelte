@@ -6,7 +6,6 @@
 	import Spinner from '$lib/components/Spinner.svelte';
 	import type { PageData } from './$types';
 	import type { PokemonCard, PokemonDetails } from '$lib/types';
-	import { CONFIG } from '$lib/config';
 	import { Button } from "$lib/components/ui/button/index.js";
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { Label } from "$lib/components/ui/label/index.js";
@@ -16,111 +15,68 @@
 	
 	let selectedPokemon = $state<PokemonDetails | null>(null);
 	let loadingDetails = $state(false);
-	let searchTerm = $state(data.searchTerm || '');
-	let selectedTypeValue = $state(data.selectedType || '');
+	let searchTerm = $state('');
+	let selectedTypeValue = $state('');
 	let sidebarOpen = $state(false);
 	
-	// Load more state from server
-	let currentlyLoaded = $state(data.currentlyLoaded || 5);
-	let maxPokemon = $state(data.maxPokemon || 50);
+	// Get pagination data from server
+	let currentlyLoaded = $state(data.currentlyLoaded || 20);
 	let canLoadMore = $state(data.canLoadMore || false);
-	let remainingCount = $state(data.remainingCount || 0);
-
-	// Use server-side data directly
-	const pokemons = $derived(data.pokemons || []);
-
+	
 	// Update state when data changes
 	$effect(() => {
-		currentlyLoaded = data.currentlyLoaded || 5;
-		maxPokemon = data.maxPokemon || 50;
+		currentlyLoaded = data.currentlyLoaded || 20;
 		canLoadMore = data.canLoadMore || false;
-		remainingCount = data.remainingCount || 0;
-		
-		// Sync search and filter state from server
-		searchTerm = data.searchTerm || '';
-		selectedTypeValue = data.selectedType || '';
-		
-		// Stop searching indicator when data arrives
-		isSearching = false;
 	});
-
-	// Search handlers - simplified
-	let searchTimeout: ReturnType<typeof setTimeout> | undefined;
-	let isSearching = $state(false);
 	
-	function handleSearchInput(value: string) {
-		searchTerm = value;
-		isSearching = true;
+	// Client-side filtering - much faster!
+	const filteredPokemons = $derived.by(() => {
+		let filtered = data.pokemons || [];
 		
-		// Clear existing timeout
-		if (searchTimeout) {
-			clearTimeout(searchTimeout);
+		if (searchTerm) {
+			filtered = filtered.filter(p => 
+				p.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+			);
 		}
 		
-		// Quick debounce for better UX
-		searchTimeout = setTimeout(() => {
-			updateURL();
-		}, CONFIG.DEBOUNCE_DELAY);
-	}
-
-	function handleSearch() {
-		// Immediate search when Enter is pressed
-		if (searchTimeout) {
-			clearTimeout(searchTimeout);
-		}
-		isSearching = true;
-		updateURL();
-	}
-
-	function handleTypeChange(value: string) {
-		selectedTypeValue = value || '';
-		isSearching = true;
-		// Immediate filter change
-		updateURL();
-	}
-
-	function clearSearch() {
-		searchTerm = '';
-		isSearching = true;
-		updateURL();
-	}
-
-	function resetFilters() {
-		searchTerm = '';
-		selectedTypeValue = '';
-		isSearching = true;
-		updateURL();
-	}
-
-	// Update URL to trigger server reload - simplified
-	function updateURL() {
-		const params = new URLSearchParams();
-		
-		// Add search if exists
-		if (searchTerm && searchTerm.trim().length > 0) {
-			params.set('search', searchTerm.trim());
+		if (selectedTypeValue && selectedTypeValue !== '') {
+			filtered = filtered.filter(p => 
+				p.types.includes(selectedTypeValue.toLowerCase())
+			);
 		}
 		
-		// Add type filter if exists  
-		if (selectedTypeValue && selectedTypeValue !== '' && selectedTypeValue !== 'all') {
-			params.set('type', selectedTypeValue.trim());
-		}
-		
-		// Always reset to 5 Pokemon when searching or filtering
-		params.set('loaded', CONFIG.POKEMON_PER_PAGE.toString());
-		
-		const newURL = `${window.location.pathname}?${params.toString()}`;
-		goto(newURL, { replaceState: false, noScroll: true });
-	}
-
-	// Load more functions
+		return filtered; // Show all filtered results
+	});
+	
+	// Load more function
 	function loadMorePokemon() {
 		if (canLoadMore) {
 			const url = new URL(window.location.href);
-			url.searchParams.set('loaded', currentlyLoaded.toString());
-			url.searchParams.set('loadMore', 'true');
+			url.searchParams.set('loaded', (currentlyLoaded + 20).toString());
 			goto(url.toString());
 		}
+	}
+	
+	// Search handlers - simplified (no URL changes)
+	function handleSearchInput(value: string) {
+		searchTerm = value;
+	}
+	
+	function handleSearch() {
+		// Search happens instantly via $derived
+	}
+	
+	function handleTypeChange(value: string) {
+		selectedTypeValue = value || '';
+	}
+	
+	function clearSearch() {
+		searchTerm = '';
+	}
+	
+	function resetFilters() {
+		searchTerm = '';
+		selectedTypeValue = '';
 	}
 
 	async function selectPokemon(pokemon: PokemonCard) {
@@ -160,21 +116,13 @@
 	function toggleSidebar() {
 		sidebarOpen = !sidebarOpen;
 	}
-
-	$effect(() => {
-		return () => {
-			if (searchTimeout) {
-				clearTimeout(searchTimeout);
-			}
-		};
-	});
 </script>
 
 
 <div class="flex flex-col lg:flex-row h-screen overflow-hidden bg-background text-foreground">
 	<!-- Mobile Header -->
 	<div class="lg:hidden bg-card border-b border-border p-3 flex items-center justify-between">
-		<h1 class="text-lg font-bold text-primary">{CONFIG.APP_NAME}</h1>
+		<h1 class="text-lg font-bold text-primary">Pokemon Explorer</h1>
 		<button
 			onclick={toggleSidebar}
 			class="p-2 hover:bg-muted rounded-md transition-colors"
@@ -205,26 +153,24 @@
 		
 		<!-- Sidebar Content -->
 		<div class="relative bg-card p-3 lg:p-0 lg:flex-1 lg:space-y-4 xl:space-y-6 h-full lg:h-auto overflow-y-auto">
-			<!-- Mobile Close Button -->
-			<div class="lg:hidden flex items-center justify-between mb-4 pb-3 border-b border-border">
-				<h1 class="text-xl font-bold text-primary">{CONFIG.APP_NAME}</h1>
-				<button
-					onclick={() => sidebarOpen = false}
-					class="p-2 hover:bg-muted rounded-md transition-colors"
-					aria-label="Close sidebar"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-					</svg>
-				</button>
-			</div>
+		<!-- Mobile Close Button -->
+		<div class="lg:hidden flex items-center justify-between mb-4 pb-3 border-b border-border">
+			<h1 class="text-xl font-bold text-primary">Pokemon Explorer</h1>
+			<button
+				onclick={() => sidebarOpen = false}
+				class="p-2 hover:bg-muted rounded-md transition-colors"
+				aria-label="Close sidebar"
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+				</svg>
+			</button>
+		</div>
 
-			<div class="hidden lg:block text-center">
-				<h1 class="text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2">{CONFIG.APP_NAME}</h1>
-				<p class="text-xs lg:text-sm text-muted-foreground">{CONFIG.APP_DESCRIPTION}</p>
-			</div>
-
-		<!-- Search and Filters -->
+		<div class="hidden lg:block text-center">
+			<h1 class="text-2xl lg:text-3xl xl:text-4xl font-bold text-primary mb-2">Pokemon Explorer</h1>
+			<p class="text-xs lg:text-sm text-muted-foreground">Gotta catch 'em all!</p>
+		</div>		<!-- Search and Filters -->
 		<div class="space-y-3 lg:space-y-4">
 			<h3 class="text-base lg:text-lg font-semibold text-primary mb-2 lg:mb-3">Search & Filter</h3>
 
@@ -255,12 +201,6 @@
 						</button>
 					{/if}
 				</div>
-				{#if isSearching}
-					<div class="flex items-center space-x-2 text-xs text-muted-foreground">
-						<div class="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-						<span>Searching...</span>
-					</div>
-				{/if}
 			</div>
 
 			<!-- Type Filter -->
@@ -299,34 +239,12 @@
 				</div>
 			{/if}
 
-			<!-- Bottom Count Display -->
+			<!-- Simple Stats -->
 			<div class="pt-4 border-t border-border">
-				<div class="flex items-center justify-between text-sm text-muted-foreground">
-					<div class="flex items-center space-x-2">
-						<div class="w-3 h-3 bg-green-500 rounded-full"></div>
-						<span>Pokemon Explorer</span>
-						{#if searchTerm}
-							<span class="text-xs bg-blue-500/10 text-blue-600 px-2 py-1 rounded">
-								Search: "{searchTerm}"
-							</span>
-						{/if}
-						<!-- {#if selectedTypeValue && selectedTypeValue !== ''}
-							<span class="text-xs bg-gradient-to-r from-primary/20 to-primary/10 text-primary border border-primary/20 px-2 py-1 rounded-full">
-								🏷️ {selectedTypeValue} type
-							</span>
-						{/if} -->
-					</div>
+				<div class="text-sm text-muted-foreground text-center">
 					<span class="font-mono text-xs">
-						{pokemons.length}
-						{#if searchTerm}
-							search results
-						{:else if selectedTypeValue && selectedTypeValue !== ''}
-							{selectedTypeValue}-type Pokémon
-						{:else if data.filteredCount && data.filteredCount !== data.totalCount}
-							of {data.filteredCount} filtered
-						{:else}
-							of {data.totalCount || 0}
-						{/if}
+						{filteredPokemons.length} Pokemon
+						{#if searchTerm} • Search: "{searchTerm}"{/if}
 					</span>
 				</div>
 			</div>
@@ -339,12 +257,12 @@
 			<div class="p-3 lg:p-4">
 				<!-- Pokemon List/Column -->
 				<div class="space-y-3 max-w-2xl">
-					{#each pokemons as poke}
+					{#each filteredPokemons as poke}
 						<Card {poke} onclick={() => selectPokemon(poke)} />
 					{/each}
 				</div>
 
-				{#if pokemons.length === 0 && !data.error}
+				{#if filteredPokemons.length === 0}
 					<div class="text-center py-12">
 						<div class="text-muted-foreground mb-4">
 							<svg class="w-12 h-12 lg:w-16 lg:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,39 +270,32 @@
 							</svg>
 						</div>
 						<h3 class="text-base sm:text-lg font-semibold mb-2">No Pokémon found</h3>
-						<p class="text-muted-foreground text-xs sm:text-sm lg:text-base">Try adjusting your search or filter criteria.</p>
+						<p class="text-muted-foreground text-xs sm:text-sm lg:text-base">Try adjusting your search criteria.</p>
 					</div>
 				{/if}
 
-				<!-- Pagination Controls -->
+				<!-- Simple Stats -->
 				<div class="pt-6 pb-4 max-w-2xl">
-					<div class="flex flex-col items-center space-y-4 mb-4">
-						{#if canLoadMore && pokemons.length > 0}
+					<!-- Load More Button -->
+					{#if canLoadMore && !searchTerm}
+						<div class="flex justify-center mb-4">
 							<Button 
 								variant="default" 
 								size="lg"
 								onclick={loadMorePokemon}
-								class="px-6 sm:px-8 py-2 sm:py-3 text-base sm:text-lg font-semibold"
+								class="px-6 py-2 text-base font-semibold"
 							>
-								Load More ({remainingCount} Remaining)
-								<svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								Load More Pokemon (+20 more)
+								<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
 								</svg>
 							</Button>
-						{:else if currentlyLoaded >= maxPokemon && pokemons.length > 0}
-							<div class="text-center py-4">
-								<Badge variant="secondary" class="text-sm sm:text-lg px-4 sm:px-6 py-1 sm:py-2">
-									🎉 All Pokemon Downloaded ({maxPokemon}/{maxPokemon})
-								</Badge>
-							</div>
-						{/if}
-					</div>
-					
-					{#if pokemons.length > 0}
-						<p class="text-xs sm:text-sm text-muted-foreground text-center">
-							Showing {pokemons.length} of {data.filteredCount || data.totalCount || 1302} Pokemon
-						</p>
+						</div>
 					{/if}
+					
+					<p class="text-xs sm:text-sm text-muted-foreground text-center">
+						{#if !searchTerm && canLoadMore} • Click "Load More" for more Pokemon{/if}
+					</p>
 				</div>
 			</div>
 		</div>

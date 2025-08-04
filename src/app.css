@@ -2,9 +2,7 @@
 
 @import "tw-animate-css";
 
-/* Removed unsupported @custom-variant at-rule */
 
-/* إخفاء شريط التمرير مع الحفاظ على الوظيفة */
 .scrollbar-none {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer and Edge */
