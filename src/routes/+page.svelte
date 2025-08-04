@@ -161,7 +161,6 @@
 		sidebarOpen = !sidebarOpen;
 	}
 
-	// Cleanup timeout on component destroy
 	$effect(() => {
 		return () => {
 			if (searchTimeout) {

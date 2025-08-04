@@ -3,7 +3,6 @@
 
 	let { children } = $props();
 	
-	// Simple error boundary to catch CSS issues
 	$effect(() => {
 		try {
 			// Force CSS to load
