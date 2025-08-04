@@ -86,21 +86,26 @@
 		try {
 			// Use local API route that proxies to PokéAPI
 			const res = await fetch(`/api/pokemon/${pokemon.id}`);
+			
+			if (!res.ok) {
+				throw new Error(`HTTP error! status: ${res.status}`);
+			}
+			
 			const details = await res.json();
 			
 			selectedPokemon = {
 				id: pokemon.id,
-				name: details.name,
-				image: details.sprites.front_default,
-				types: details.types.map((t: { type: { name: string } }) => t.type.name),
-				stats: details.stats.map((s: { stat: { name: string }; base_stat: number }) => ({
+				name: details.name || 'Unknown',
+				image: details.sprites?.front_default || details.sprites?.other?.['official-artwork']?.front_default || '/favicon.svg',
+				types: details.types?.map((t: { type: { name: string } }) => t.type.name) || [],
+				stats: details.stats?.map((s: { stat: { name: string }; base_stat: number }) => ({
 					name: s.stat.name,
 					value: s.base_stat
-				})),
-				abilities: details.abilities.map((a: { ability: { name: string } }) => a.ability.name),
-				height: details.height,
-				weight: details.weight,
-				base_experience: details.base_experience
+				})) || [],
+				abilities: details.abilities?.map((a: { ability: { name: string } }) => a.ability.name) || [],
+				height: details.height || 0,
+				weight: details.weight || 0,
+				base_experience: details.base_experience || 0
 			};
 		} catch (error) {
 			console.error('Failed to load Pokemon details:', error);
