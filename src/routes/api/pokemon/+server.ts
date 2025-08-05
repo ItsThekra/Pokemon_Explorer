@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 
-export async function GET({ url }) {
+export async function GET({ url }) 
+{
   const limit = url.searchParams.get('limit') || '20';
   const offset = url.searchParams.get('offset') || '0';
   

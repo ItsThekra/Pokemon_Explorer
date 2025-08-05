@@ -79,9 +79,9 @@
 		selectedTypeValue = '';
 	}
 
+	// This is funcation for select a Pokémon and fetch details
 	async function selectPokemon(pokemon: PokemonCard) {
 		sidebarOpen = false;
-		
 		loadingDetails = true;
 		try {
 			// Use local API route that proxies to PokéAPI
@@ -95,7 +95,7 @@
 			
 			selectedPokemon = {
 				id: pokemon.id,
-				name: details.name || 'Unknown',
+				name:  details.name || 'Unknown',
 				image: details.sprites?.front_default || details.sprites?.other?.['official-artwork']?.front_default || '/favicon.svg',
 				types: details.types?.map((t: { type: { name: string } }) => t.type.name) || [],
 				stats: details.stats?.map((s: { stat: { name: string }; base_stat: number }) => ({
@@ -123,7 +123,7 @@
 	}
 </script>
 
-
+<!-- --------------------- UI SECTION ----------------------------- -->
 <div class="flex flex-col lg:flex-row h-screen overflow-hidden bg-background text-foreground">
 	<!-- Mobile Header -->
 	<div class="lg:hidden bg-card border-b border-border p-3 flex items-center justify-between">
@@ -368,7 +368,7 @@
 								</div>
 							{/if}
 
-							<!-- Base Stats with Modern Design -->
+							<!-- Base Stats -->
 							{#if selectedPokemon.stats.length > 0}
 								<div class="bg-gradient-to-br from-accent/10 to-muted/30 p-3 sm:p-4 rounded-xl border">
 									<h3 class="text-sm sm:text-base font-bold mb-3 sm:mb-4 text-center text-primary">Base Stats (Total: {totalStats})</h3>

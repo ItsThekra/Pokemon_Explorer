@@ -1,3 +1,4 @@
+// This page is waiting for the params to featch Pokémon details
 import { json } from '@sveltejs/kit';
 
 export async function GET({ params }) {
@@ -7,9 +8,10 @@ export async function GET({ params }) {
     if (!response.ok) {
       throw new Error(`Failed to fetch Pokemon: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return json(data);
+
   } catch (error) {
     console.error('API: Error fetching Pokemon:', error);
     return json({ error: 'Failed to fetch Pokemon' }, { status: 500 });
