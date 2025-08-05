@@ -192,7 +192,7 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
     overflow-y: auto;
-    direction: ltr; 
+    direction: ltr;
   }
 
   .pokemon-list-scroll::-webkit-scrollbar {
