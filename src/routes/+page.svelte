@@ -29,7 +29,7 @@
 		canLoadMore = data.canLoadMore || false;
 	});
 	
-	// Client-side filtering - much faster!
+	// Filtering
 	const filteredPokemons = $derived.by(() => {
 		let filtered = data.pokemons || [];
 		
@@ -57,13 +57,12 @@
 		}
 	}
 	
-	// Search handlers - simplified (no URL changes)
+	// Search handlers 
 	function handleSearchInput(value: string) {
 		searchTerm = value;
 	}
 	
 	function handleSearch() {
-		// Search happens instantly via $derived
 	}
 	
 	function handleTypeChange(value: string) {

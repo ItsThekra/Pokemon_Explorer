@@ -128,9 +128,7 @@
   }
 }
 
-/* Custom Beautiful Scrollbar */
 @layer utilities {
-  /* Webkit browsers (Chrome, Safari, Edge) */
   .custom-scrollbar::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -162,13 +160,12 @@
     transform: scale(1.1);
   }
 
-  /* Firefox scrollbar */
+  
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--primary) / 0.6) hsl(var(--muted) / 0.3);
   }
 
-  /* Dark mode adjustments */
   .dark .custom-scrollbar::-webkit-scrollbar-track {
     background: hsl(var(--muted) / 0.2);
   }
@@ -195,7 +192,7 @@
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
     overflow-y: auto;
-    direction: ltr; /* Force LTR direction for right-side scrollbar */
+    direction: ltr; 
   }
 
   .pokemon-list-scroll::-webkit-scrollbar {
